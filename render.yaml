@@ -1,0 +1,14 @@
+services:
+  - type: web
+    name: ai-video-generator
+    env: python
+    plan: free
+    buildCommand: |
+      apt-get update
+      apt-get install -y ffmpeg libjpeg-dev zlib1g-dev python3-dev
+      pip install --upgrade pip setuptools wheel
+      pip install -r requirements.txt
+    startCommand: gunicorn app:app --bind 0.0.0.0:$PORT
+    envVars:
+      - key: PYTHON_VERSION
+        value: 3.11.7
