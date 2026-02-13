@@ -1,0 +1,351 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI Video Generator</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+
+        .container {
+            background: white;
+            border-radius: 20px;
+            padding: 40px;
+            max-width: 600px;
+            width: 100%;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+        }
+
+        h1 {
+            text-align: center;
+            color: #333;
+            margin-bottom: 10px;
+            font-size: 2em;
+        }
+
+        .subtitle {
+            text-align: center;
+            color: #666;
+            margin-bottom: 30px;
+            font-size: 0.9em;
+        }
+
+        .input-group {
+            margin-bottom: 20px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 8px;
+            color: #333;
+            font-weight: 600;
+        }
+
+        input[type="text"] {
+            width: 100%;
+            padding: 15px;
+            border: 2px solid #e0e0e0;
+            border-radius: 10px;
+            font-size: 16px;
+            transition: border-color 0.3s;
+        }
+
+        input[type="text"]:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+
+        .btn {
+            width: 100%;
+            padding: 15px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            border-radius: 10px;
+            font-size: 18px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 20px rgba(102, 126, 234, 0.4);
+        }
+
+        .btn:active {
+            transform: translateY(0);
+        }
+
+        .btn:disabled {
+            background: #ccc;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .status-box {
+            margin-top: 30px;
+            padding: 20px;
+            background: #f8f9fa;
+            border-radius: 10px;
+            display: none;
+        }
+
+        .status-box.show {
+            display: block;
+        }
+
+        .status-message {
+            font-size: 16px;
+            color: #333;
+            margin-bottom: 15px;
+            text-align: center;
+        }
+
+        .progress-container {
+            background: #e0e0e0;
+            border-radius: 10px;
+            overflow: hidden;
+            height: 30px;
+            margin-bottom: 15px;
+        }
+
+        .progress-bar {
+            height: 100%;
+            background: linear-gradient(90deg, #667eea 0%, #764ba2 100%);
+            width: 0%;
+            transition: width 0.3s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: 600;
+        }
+
+        .download-btn {
+            background: #28a745;
+            margin-top: 15px;
+        }
+
+        .download-btn:hover {
+            box-shadow: 0 10px 20px rgba(40, 167, 69, 0.4);
+        }
+
+        .error-message {
+            color: #dc3545;
+            background: #f8d7da;
+            padding: 15px;
+            border-radius: 10px;
+            margin-top: 15px;
+            border: 1px solid #f5c6cb;
+        }
+
+        .examples {
+            margin-top: 20px;
+            padding: 15px;
+            background: #e3f2fd;
+            border-radius: 10px;
+            border-left: 4px solid #2196f3;
+        }
+
+        .examples h3 {
+            color: #1976d2;
+            margin-bottom: 10px;
+            font-size: 1em;
+        }
+
+        .examples ul {
+            list-style: none;
+            padding-left: 0;
+        }
+
+        .examples li {
+            color: #555;
+            margin-bottom: 5px;
+            padding-left: 20px;
+            position: relative;
+        }
+
+        .examples li:before {
+            content: "💡";
+            position: absolute;
+            left: 0;
+        }
+
+        .reset-btn {
+            background: #6c757d;
+            margin-top: 10px;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .spinner {
+            border: 3px solid #f3f3f3;
+            border-top: 3px solid #667eea;
+            border-radius: 50%;
+            width: 30px;
+            height: 30px;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 15px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🎬 AI Video Generator</h1>
+        <p class="subtitle">Create YouTube-ready videos from any topic in minutes!</p>
+
+        <div class="input-group">
+            <label for="topic">Enter Your Video Topic:</label>
+            <input type="text" id="topic" placeholder="e.g., The History of Coffee" autocomplete="off">
+        </div>
+
+        <button class="btn" id="generateBtn" onclick="generateVideo()">
+            🚀 Generate Video
+        </button>
+
+        <div class="status-box" id="statusBox">
+            <div class="spinner" id="spinner" style="display: none;"></div>
+            <div class="status-message" id="statusMessage"></div>
+            <div class="progress-container">
+                <div class="progress-bar" id="progressBar">0%</div>
+            </div>
+            <button class="btn download-btn" id="downloadBtn" onclick="downloadVideo()" style="display: none;">
+                📥 Download Video
+            </button>
+            <button class="btn reset-btn" id="resetBtn" onclick="resetStatus()" style="display: none;">
+                🔄 Generate Another Video
+            </button>
+        </div>
+
+        <div id="errorBox"></div>
+
+        <div class="examples">
+            <h3>💡 Example Topics:</h3>
+            <ul>
+                <li>How to Make French Press Coffee</li>
+                <li>The History of the Internet</li>
+                <li>5 Benefits of Morning Exercise</li>
+                <li>What is Artificial Intelligence?</li>
+            </ul>
+        </div>
+    </div>
+
+    <script>
+        let statusInterval = null;
+
+        function generateVideo() {
+            const topic = document.getElementById('topic').value.trim();
+            
+            if (!topic) {
+                alert('Please enter a topic!');
+                return;
+            }
+
+            document.getElementById('generateBtn').disabled = true;
+            document.getElementById('statusBox').classList.add('show');
+            document.getElementById('spinner').style.display = 'block';
+            document.getElementById('downloadBtn').style.display = 'none';
+            document.getElementById('resetBtn').style.display = 'none';
+            document.getElementById('errorBox').innerHTML = '';
+
+            fetch('/generate', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({ topic: topic })
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.error) {
+                    showError(data.error);
+                } else {
+                    checkStatus();
+                }
+            })
+            .catch(error => {
+                showError('Failed to start generation: ' + error);
+                document.getElementById('generateBtn').disabled = false;
+            });
+        }
+
+        function checkStatus() {
+            statusInterval = setInterval(() => {
+                fetch('/status')
+                .then(response => response.json())
+                .then(data => {
+                    updateStatus(data);
+                    
+                    if (data.status === 'completed' || data.status === 'error') {
+                        clearInterval(statusInterval);
+                    }
+                })
+                .catch(error => {
+                    console.error('Status check failed:', error);
+                });
+            }, 1000);
+        }
+
+        function updateStatus(data) {
+            document.getElementById('statusMessage').textContent = data.message;
+            document.getElementById('progressBar').style.width = data.progress + '%';
+            document.getElementById('progressBar').textContent = data.progress + '%';
+
+            if (data.status === 'completed') {
+                document.getElementById('spinner').style.display = 'none';
+                document.getElementById('downloadBtn').style.display = 'block';
+                document.getElementById('resetBtn').style.display = 'block';
+                document.getElementById('generateBtn').disabled = false;
+            } else if (data.status === 'error') {
+                document.getElementById('spinner').style.display = 'none';
+                showError(data.error);
+                document.getElementById('generateBtn').disabled = false;
+                document.getElementById('resetBtn').style.display = 'block';
+            }
+        }
+
+        function downloadVideo() {
+            window.location.href = '/download';
+        }
+        function resetStatus() {
+            fetch('/reset')
+            .then(() => {
+                document.getElementById('statusBox').classList.remove('show');
+                document.getElementById('progressBar').style.width = '0%';
+                document.getElementById('topic').value = '';
+                document.getElementById('errorBox').innerHTML = '';
+                document.getElementById('generateBtn').disabled = false;
+            });
+        }
+
+        function showError(message) {
+            document.getElementById('errorBox').innerHTML = 
+                '<div class="error-message">❌ ' + message + '</div>';
+            document.getElementById('spinner').style.display = 'none';
+            document.getElementById('generateBtn').disabled = false;
+        }
+        document.getElementById('topic').addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') {
+                generateVideo();
+            }
+        });
+    </script>
+</body>
+</html>

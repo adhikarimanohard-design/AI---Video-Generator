@@ -1,0 +1,21 @@
+{
+  "title": "Everything About Future of AI",
+  "script": "Welcome to our video about Future of AI. This is a fascinating subject that many people want to learn about. Let's explore the key aspects together.",
+  "scenes": [
+    {
+      "duration": 5,
+      "description": "intro to Future of AI",
+      "text": "Welcome to our video about Future of AI."
+    },
+    {
+      "duration": 5,
+      "description": "Future of AI main content",
+      "text": "This is a fascinating subject that many people want to learn about."
+    },
+    {
+      "duration": 5,
+      "description": "Future of AI conclusion",
+      "text": "Let's explore the key aspects together."
+    }
+  ]
+}
