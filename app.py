@@ -12,12 +12,6 @@ from pathlib import Path
 from video_pipeline import VideoGenerationPipeline
 import logging
 
-----------------------
-
-Setup
-
-----------------------
-
 app = Flask(name)
 app.config['SECRET_KEY'] = 'ai-video-pipeline-secret-key'
 
@@ -33,12 +27,6 @@ generation_status = {
 'video_path': None,
 'error': None
 }
-
-----------------------
-
-Background video generation
-
-----------------------
 
 def generate_video_background(topic):
 """Generate video in background thread"""
@@ -108,12 +96,6 @@ except Exception as e:
             'error': str(e)  
         }
 
-----------------------
-
-Routes
-
-----------------------
-
 @app.route('/')
 def index():
 return render_template('index.html')
@@ -168,12 +150,6 @@ generation_status = {
 'error': None
 }
 return jsonify({'message': 'Status reset'})
-
-----------------------
-
-No app.run() needed for Render / Gunicorn
-
-----------------------
 
 Just make sure 'output' directory exists
 
