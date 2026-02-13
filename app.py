@@ -1,26 +1,13 @@
-#!/usr/bin/env python3
-"""
-AI Video Generation Pipeline - Web Application
-Flask web interface for generating videos from topics
-"""
-
 from flask import Flask, render_template, request, jsonify, send_file
 import os
 import threading
-import time
-from pathlib import Path
 from video_pipeline import VideoGenerationPipeline
 import logging
 
-# ----------------------
-# Setup
-# ----------------------
 app = Flask(__name__)
 app.config['SECRET_KEY'] = 'ai-video-pipeline-secret-key'
-
 logging.basicConfig(level=logging.INFO)
 
-# Thread-safe generation status
 status_lock = threading.Lock()
 generation_status = {
     'status': 'idle',
@@ -30,13 +17,8 @@ generation_status = {
     'error': None
 }
 
-# ----------------------
-# Background video generation
-# ----------------------
 def generate_video_background(topic):
-    """Generate video in background thread"""
     global generation_status
-
     try:
         with status_lock:
             generation_status = {
@@ -48,48 +30,31 @@ def generate_video_background(topic):
             }
 
         pipeline = VideoGenerationPipeline(output_dir="output")
-
-        # Step 1: Generate script
-        with status_lock:
-            generation_status['message'] = '🎬 Generating AI script...'
-            generation_status['progress'] = 25
         script_data = pipeline.step1_generate_script(topic)
 
-        # Step 2: Generate voiceover
         with status_lock:
             generation_status['message'] = '🎙️ Creating voiceover...'
             generation_status['progress'] = 40
         audio_path = pipeline.step2_generate_voiceover(script_data)
 
-        # Step 3: Fetch visuals
         with status_lock:
             generation_status['message'] = '🖼️ Fetching visuals...'
             generation_status['progress'] = 60
         visual_paths = pipeline.step3_fetch_visuals(script_data)
 
-        # Step 4: Combine into video
         with status_lock:
             generation_status['message'] = '🎬 Assembling final video...'
             generation_status['progress'] = 80
         video_path = pipeline.step4_combine_into_video(script_data, audio_path, visual_paths)
 
         with status_lock:
-            if video_path:
-                generation_status = {
-                    'status': 'completed',
-                    'message': '✅ Video ready for download!',
-                    'progress': 100,
-                    'video_path': video_path,
-                    'error': None
-                }
-            else:
-                generation_status = {
-                    'status': 'error',
-                    'message': '❌ Video generation failed',
-                    'progress': 0,
-                    'video_path': None,
-                    'error': 'Video pipeline returned None'
-                }
+            generation_status = {
+                'status': 'completed' if video_path else 'error',
+                'message': '✅ Video ready!' if video_path else '❌ Video generation failed',
+                'progress': 100 if video_path else 0,
+                'video_path': str(video_path) if video_path else None,
+                'error': None if video_path else 'Pipeline returned None'
+            }
 
     except Exception as e:
         with status_lock:
@@ -101,18 +66,12 @@ def generate_video_background(topic):
                 'error': str(e)
             }
 
-# ----------------------
-# Routes
-# ----------------------
 @app.route('/')
-def index():
-    return render_template('index.html')
+def index(): return render_template('index.html')
 
 @app.route('/generate', methods=['POST'])
 def generate():
     global generation_status
-    logging.info("Received generate request")
-
     with status_lock:
         if generation_status['status'] == 'running':
             return jsonify({'error': 'Video generation already in progress'}), 400
@@ -125,14 +84,16 @@ def generate():
     thread = threading.Thread(target=generate_video_background, args=(topic,))
     thread.daemon = True
     thread.start()
-
     return jsonify({'message': 'Video generation started', 'status': 'running'})
 
 @app.route('/status')
 def status():
     try:
         with status_lock:
-            return jsonify(generation_status)
+            status_copy = generation_status.copy()
+            if status_copy.get('video_path'):
+                status_copy['video_path'] = str(status_copy['video_path'])
+            return jsonify(status_copy)
     except Exception as e:
         return jsonify({'status': 'error', 'message': str(e)}), 500
 
@@ -140,11 +101,9 @@ def status():
 def download():
     with status_lock:
         video_path = generation_status.get('video_path')
-
     if video_path and os.path.exists(video_path):
         return send_file(video_path, as_attachment=True, download_name='ai_generated_video.mp4')
-    else:
-        return jsonify({'error': 'No video available'}), 404
+    return jsonify({'error': 'No video available'}), 404
 
 @app.route('/reset')
 def reset():
@@ -159,8 +118,4 @@ def reset():
         }
     return jsonify({'message': 'Status reset'})
 
-# ----------------------
-# No app.run() needed for Render / Gunicorn
-# ----------------------
-# Just make sure 'output' directory exists
 os.makedirs('output', exist_ok=True)
