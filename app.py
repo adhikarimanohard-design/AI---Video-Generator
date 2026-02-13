@@ -151,6 +151,4 @@ generation_status = {
 }
 return jsonify({'message': 'Status reset'})
 
-Just make sure 'output' directory exists
-
 os.makedirs('output', exist_ok=True)
