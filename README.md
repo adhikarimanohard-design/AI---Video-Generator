@@ -6,9 +6,12 @@ One input → One automated video pipeline
 
 This project demonstrates how AI, text-to-speech, media APIs, and video processing can be orchestrated into a single end-to-end workflow.
 
+---
+
 🎥 Demo
 📺 YouTube Demo-: https://youtu.be/yKICsgxbH8k?si=_AHyQa-MOHljFuWI
 
+---
 
 🚀 What This Project Does
 
