@@ -6,6 +6,10 @@ One input → One automated video pipeline
 
 This project demonstrates how AI, text-to-speech, media APIs, and video processing can be orchestrated into a single end-to-end workflow.
 
+🎥 Demo
+📺 YouTube Demo-: https://youtu.be/yKICsgxbH8k?si=_AHyQa-MOHljFuWI
+
+
 🚀 What This Project Does
 
 You provide a TOPIC, and the system automatically:
@@ -85,9 +89,6 @@ Media Processing: MoviePy, FFmpeg
 
 APIs: Pexels
 Automation (optional): n8n
-
-🎥 Demo
-📺 YouTube Demo-: https://youtu.be/yKICsgxbH8k?si=_AHyQa-MOHljFuWI
 
 Due to free hosting limitations for long-running video generation and FFmpeg, the complete pipeline is demonstrated via video.
 
