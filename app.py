@@ -4,6 +4,8 @@ import os
 import threading
 from video_pipeline import VideoGenerationPipeline
 import logging
+import queue
+import time
 
 app = Flask(__name__)
 app.config['SECRET_KEY'] = 'ai-video-pipeline-secret-key'
@@ -13,7 +15,7 @@ logging.basicConfig(level=logging.INFO)
 # Ensure output folder exists
 os.makedirs('output', exist_ok=True)
 
-# Thread-safe generation status
+# Thread-safe generation status with a queue for updates
 status_lock = threading.Lock()
 generation_status = {
     'status': 'idle',
@@ -22,6 +24,9 @@ generation_status = {
     'video_path': None,
     'error': None
 }
+
+# Queue to communicate progress updates safely
+progress_queue = queue.Queue()
 
 # ----------------------
 # Auto delete generated video
@@ -43,76 +48,68 @@ def delete_file_later(file_path, delay=120):
 # Background video generation
 # ----------------------
 def generate_video_background(topic):
-    """Generate video in background thread"""
     global generation_status
 
     try:
         with status_lock:
-            generation_status = {
+            generation_status.update({
                 'status': 'running',
                 'message': 'Initializing pipeline...',
-                'progress': 10,
+                'progress': 5,
                 'video_path': None,
                 'error': None
-            }
+            })
 
         pipeline = VideoGenerationPipeline(output_dir="output")
 
-        # Step 1: Generate script
+        # Step 1: Script
         with status_lock:
-            generation_status['message'] = '🎬 Generating AI script...'
-            generation_status['progress'] = 25
+            generation_status.update({'message': '🎬 Generating AI script...', 'progress': 10})
         script_data = pipeline.step1_generate_script(topic)
 
-        # Step 2: Generate voiceover
+        # Step 2: Voiceover
         with status_lock:
-            generation_status['message'] = '🎙️ Creating voiceover...'
-            generation_status['progress'] = 40
+            generation_status.update({'message': '🎙️ Creating voiceover...', 'progress': 35})
         audio_path = pipeline.step2_generate_voiceover(script_data)
 
-        # Step 3: Fetch visuals
+        # Step 3: Visuals
         with status_lock:
-            generation_status['message'] = '🖼️ Fetching visuals...'
-            generation_status['progress'] = 60
+            generation_status.update({'message': '🖼️ Fetching visuals...', 'progress': 60})
         visual_paths = pipeline.step3_fetch_visuals(script_data)
 
-        # Step 4: Combine into video
+        # Step 4: Combine video
         with status_lock:
-            generation_status['message'] = '🎬 Assembling final video...'
-            generation_status['progress'] = 80
+            generation_status.update({'message': '🎬 Assembling final video...', 'progress': 80})
         video_path = pipeline.step4_combine_into_video(script_data, audio_path, visual_paths)
 
         with status_lock:
             if video_path:
-                generation_status = {
+                generation_status.update({
                     'status': 'completed',
                     'message': '✅ Video ready for download!',
                     'progress': 100,
                     'video_path': video_path,
                     'error': None
-                }
-
-                # schedule delete after 2 minutes
+                })
                 delete_file_later(video_path, 120)
-
             else:
-                generation_status = {
+                generation_status.update({
                     'status': 'error',
                     'message': '❌ Video generation failed',
                     'progress': 0,
                     'video_path': None,
                     'error': 'Video pipeline returned None'
-                }
+                })
 
     except Exception as e:
         with status_lock:
-            generation_status = {
+            generation_status.update({
                 'status': 'error',
                 'message': f'❌ Error: {str(e)}',
                 'progress': 0,
                 'video_path': None,
                 'error': str(e)
-            }
+            })
 
 # ----------------------
 # Routes
@@ -125,7 +122,6 @@ def index():
 @app.route('/generate', methods=['POST'])
 def generate():
     global generation_status
-    logging.info("Received generate request")
 
     with status_lock:
         if generation_status['status'] == 'running':
@@ -159,11 +155,7 @@ def download():
         video_path = generation_status.get('video_path')
 
     if video_path and os.path.exists(video_path):
-        return send_file(
-            video_path,
-            as_attachment=True,
-            download_name='ai_generated_video.mp4'
-        )
+        return send_file(video_path, as_attachment=True, download_name='ai_generated_video.mp4')
     else:
         return jsonify({'error': 'No video available'}), 404
 
@@ -171,16 +163,14 @@ def download():
 @app.route('/reset')
 def reset():
     global generation_status
-
     with status_lock:
-        generation_status = {
+        generation_status.update({
             'status': 'idle',
             'message': 'Ready to generate videos',
             'progress': 0,
             'video_path': None,
             'error': None
-        }
-
+        })
     return jsonify({'message': 'Status reset'})
 
 
@@ -189,4 +179,4 @@ def reset():
 # ----------------------
 if __name__ == "__main__":
     port = int(os.environ.get("PORT", 5000))
-    app.run(host="0.0.0.0", port=port)
+    app.run(host="0.0.0.0", port=port, threaded=True)
