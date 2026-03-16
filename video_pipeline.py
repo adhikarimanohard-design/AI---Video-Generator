@@ -459,10 +459,10 @@ Total duration should be 45-60 seconds. Include 5-8 scenes."""
                 codec='libx264',
                 audio_codec='aac',
                 fps=24,
-                preset='medium',
-                audio_bitrate='192k',
-                bitrate='5000k',
-                threads=4,
+                preset='ultrafast',
+                audio_bitrate='128k',
+                bitrate='1500k',
+                threads=1,
                 ffmpeg_params=["-pix_fmt", "yuv420p"]  # <--- FIX: Forces compatible color format
             )
             
