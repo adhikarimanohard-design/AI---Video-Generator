@@ -10,6 +10,9 @@ app.config['SECRET_KEY'] = 'ai-video-pipeline-secret-key'
 
 logging.basicConfig(level=logging.INFO)
 
+# Ensure output folder exists
+os.makedirs('output', exist_ok=True)
+
 # Thread-safe generation status
 status_lock = threading.Lock()
 generation_status = {
@@ -21,11 +24,28 @@ generation_status = {
 }
 
 # ----------------------
+# Auto delete generated video
+# ----------------------
+def delete_file_later(file_path, delay=120):
+    def delete():
+        try:
+            if os.path.exists(file_path):
+                os.remove(file_path)
+                logging.info(f"🗑 Deleted file: {file_path}")
+        except Exception as e:
+            logging.error(f"Delete error: {e}")
+
+    timer = threading.Timer(delay, delete)
+    timer.daemon = True
+    timer.start()
+
+# ----------------------
 # Background video generation
 # ----------------------
 def generate_video_background(topic):
     """Generate video in background thread"""
     global generation_status
+
     try:
         with status_lock:
             generation_status = {
@@ -71,6 +91,10 @@ def generate_video_background(topic):
                     'video_path': video_path,
                     'error': None
                 }
+
+                # schedule delete after 2 minutes
+                delete_file_later(video_path, 120)
+
             else:
                 generation_status = {
                     'status': 'error',
@@ -109,6 +133,7 @@ def generate():
 
     data = request.get_json()
     topic = data.get('topic', '').strip()
+
     if not topic:
         return jsonify({'error': 'Please provide a topic'}), 400
 
@@ -134,7 +159,11 @@ def download():
         video_path = generation_status.get('video_path')
 
     if video_path and os.path.exists(video_path):
-        return send_file(video_path, as_attachment=True, download_name='ai_generated_video.mp4')
+        return send_file(
+            video_path,
+            as_attachment=True,
+            download_name='ai_generated_video.mp4'
+        )
     else:
         return jsonify({'error': 'No video available'}), 404
 
@@ -142,6 +171,7 @@ def download():
 @app.route('/reset')
 def reset():
     global generation_status
+
     with status_lock:
         generation_status = {
             'status': 'idle',
@@ -150,8 +180,13 @@ def reset():
             'video_path': None,
             'error': None
         }
+
     return jsonify({'message': 'Status reset'})
 
 
-# Ensure output folder exists
-os.makedirs('output', exist_ok=True)
+# ----------------------
+# Run server (Render compatible)
+# ----------------------
+if __name__ == "__main__":
+    port = int(os.environ.get("PORT", 5000))
+    app.run(host="0.0.0.0", port=port)
