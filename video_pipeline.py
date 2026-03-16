@@ -403,8 +403,8 @@ Total duration should be 45-60 seconds. Include 5-8 scenes."""
                         loops_needed = int(scene_duration / clip.duration) + 1
                         clip = concatenate_videoclips([clip] * loops_needed).subclip(0, scene_duration)
                     
-                    # Resize to 1080p maintaining aspect ratio
-                    clip = clip.resize(height=1080)
+                    # Resize to 720p maintaining aspect ratio
+                    clip = clip.resize(height=720)
                     
                     # Force even dimensions (macroblock alignment) for h264
                     if clip.w % 2 != 0:
