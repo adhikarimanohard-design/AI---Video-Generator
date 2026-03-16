@@ -1,3 +1,4 @@
+
 #!/usr/bin/env python3
 """
 AI Video Generation Pipeline - CORRECTED VERSION
@@ -10,6 +11,7 @@ Pipeline steps:
 4. Combine into .mp4 (FFmpeg/MoviePy)
 
 FIXES:
+- Added ffmpeg_params=["-pix_fmt", "yuv420p"] to fix Windows playback error 0x80004005
 - Audio now properly attached to video with set_audio()
 - Better error handling and debugging
 - Duration matching improved
@@ -405,6 +407,10 @@ Total duration should be 45-60 seconds. Include 5-8 scenes."""
                     # Resize to 1080p maintaining aspect ratio
                     clip = clip.resize(height=1080)
                     
+                    # Force even dimensions (macroblock alignment) for h264
+                    if clip.w % 2 != 0:
+                        clip = clip.crop(x1=0, y1=0, width=clip.w-1, height=clip.h)
+
                     clips.append(clip)
                     cumulative_duration += clip.duration
                     print(f"      ✓ Visual {i+1} loaded: {clip.duration:.2f}s")
@@ -457,7 +463,8 @@ Total duration should be 45-60 seconds. Include 5-8 scenes."""
                 preset='medium',
                 audio_bitrate='192k',
                 bitrate='5000k',
-                threads=4
+                threads=4,
+                ffmpeg_params=["-pix_fmt", "yuv420p"]  # <--- FIX: Forces compatible color format
             )
             
             # Verify output file
@@ -698,7 +705,6 @@ Setup Instructions:
         print(f"\n❌ Unexpected error: {e}")
         import traceback
         traceback.print_exc()
-
 
 if __name__ == "__main__":
     main()
