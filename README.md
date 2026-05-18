@@ -83,7 +83,7 @@ Automation tools like n8n
 
 Backend: Python, Flask
 
-AI / LLM: Groq / Gemini
+AI / LLM: Groq
 
 Text-to-Speech:
 
