@@ -26,6 +26,21 @@ Combines everything into a final .mp4 video
 
 ✅ Output is ready for YouTube / Shorts / Reels
 
+---
+
+🔢 Quantified Metrics
+
+Generates a complete video from 1 topic prompt
+Full pipeline completes in ~60–90 seconds
+
+Output video length ~22 seconds (as seen in demo)
+
+Uses 4 free-tier APIs orchestrated in one pipeline
+
+Supports export as YouTube/Shorts ready .mp4
+
+---
+
 🧠 Pipeline Overview
 Copy code
 
@@ -39,7 +54,10 @@ Visual Fetching
   ↓
 Video Assembly (.mp4)
 
+---
+
 🔧 Pipeline Steps
+
 1️⃣ AI Script Generation
 
 Uses free-tier LLMs (Groq / Gemini )
@@ -64,12 +82,18 @@ Voiceover
 Visuals
 Transitions
 
+---
+
 Uses:
+
 MoviePy
 FFmpeg
 Outputs final .mp4 video
 
+---
+
 ⚡ Trigger Mechanism
+
 One trigger = One video
 
 Trigger options:
@@ -78,6 +102,8 @@ Web UI (Flask)
 
 API request
 Automation tools like n8n
+
+---
 
 🛠 Tech Stack-:
 
@@ -93,6 +119,8 @@ Media Processing: MoviePy, FFmpeg
 
 APIs: Pexels
 Automation (optional): n8n
+
+---
 
 Due to free hosting limitations for long-running video generation and FFmpeg, the complete pipeline is demonstrated via video.
 
@@ -111,6 +139,7 @@ The app runs fully locally
 
 A full demo video is provided instead of an unstable live deployment
 
+---
 
 🎯 Use Cases
 
@@ -121,6 +150,8 @@ Educational content creation
 
 AI media pipelines
 Workflow automation demos
+
+---
 
 👨‍💻 Author
 
