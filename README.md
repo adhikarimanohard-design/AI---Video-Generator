@@ -1,4 +1,4 @@
-🎬 AI Video Generator – Topic to YouTube-Ready Video
+# 🎬 AI Video Generator – Topic to YouTube-Ready Video
 
 Generate a complete YouTube-ready video from a single topic prompt using AI and free tools.
 
@@ -8,13 +8,13 @@ This project demonstrates how AI, text-to-speech, media APIs, and video processi
 
 ---
 
-🎥 Demo
+# 🎥 Demo
 📺 YouTube Demo-:
 https://youtu.be/KzZyPthO_5g?si=C8CKz1MnY0iMEKYE
 
 ---
 
-🚀 What This Project Does
+# 🚀 What This Project Does
 
 You provide a TOPIC, and the system automatically:
 
@@ -28,7 +28,7 @@ Combines everything into a final .mp4 video
 
 ---
 
-🔢 Quantified Metrics
+# 🔢 Quantified Metrics
 
 Generates a complete video from 1 topic prompt
 Full pipeline completes in ~60–90 seconds
@@ -41,7 +41,7 @@ Supports export as YouTube/Shorts ready .mp4
 
 ---
 
-🧠 Pipeline Overview
+# 🧠 Pipeline Overview
 Copy code
 
 TOPIC
@@ -56,26 +56,26 @@ Video Assembly (.mp4)
 
 ---
 
-🔧 Pipeline Steps
+# 🔧 Pipeline Steps
 
-1️⃣ AI Script Generation
+# 1️⃣ AI Script Generation
 
 Uses free-tier LLMs (Groq / Gemini )
 
 Generates a structured narration script based on the topic
 
-2️⃣ AI Voiceover
+# 2️⃣ AI Voiceover
 Converts script → speech
 Uses:
 
 ElevenLabs (free tier)
 Edge-TTS (free)
 
-3️⃣ Visual Generation / Fetching
+# 3️⃣ Visual Generation / Fetching
 
 Fetches relevant stock visuals
 
-4️⃣ Video Assembly
+# 4️⃣ Video Assembly
 Combines:
 
 Voiceover
@@ -84,7 +84,7 @@ Transitions
 
 ---
 
-Uses:
+# 🔑 Uses:
 
 MoviePy
 FFmpeg
@@ -92,7 +92,7 @@ Outputs final .mp4 video
 
 ---
 
-⚡ Trigger Mechanism
+# ⚡ Trigger Mechanism
 
 One trigger = One video
 
@@ -105,19 +105,34 @@ Automation tools like n8n
 
 ---
 
-🛠 Tech Stack-:
+# 🛠 Tech Stack-:
 
-Backend: Python, Flask
+# Backend: 
 
-AI / LLM: Groq
+Python, Flask
 
-Text-to-Speech:
+---
+
+# AI / LLM: 
+
+Groq
+
+---
+
+# Text-to-Speech:
 
  ElevenLabs, Edge-TTS
 
-Media Processing: MoviePy, FFmpeg
+---
 
-APIs: Pexels
+#Media Processing:
+
+MoviePy, FFmpeg
+
+---
+
+# APIs: Pexels
+
 Automation (optional): n8n
 
 ---
@@ -141,7 +156,7 @@ A full demo video is provided instead of an unstable live deployment
 
 ---
 
-🎯 Use Cases
+# 🎯 Use Cases
 
 YouTube automation
 Short-form video generation
@@ -153,6 +168,6 @@ Workflow automation demos
 
 ---
 
-👨‍💻 Author
+# 👨‍💻 Author
 
 Built to demonstrate end-to-end AI automation, media processing, and backend orchestration using free and open tools.
