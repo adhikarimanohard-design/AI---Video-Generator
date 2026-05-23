@@ -170,4 +170,6 @@ Workflow automation demos
 
 # 👨‍💻 Author
 
-Built to demonstrate end-to-end AI automation, media processing, and backend orchestration using free and open tools.
+**Adhikari Manohar Dash**  
+B.Tech CSE Student  
+Full Stack & AI Enthusiast
