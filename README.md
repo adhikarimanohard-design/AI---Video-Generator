@@ -133,7 +133,7 @@ MoviePy, FFmpeg
 
 # APIs: Pexels
 
-Automation (optional): n8n
+Automation : n8n
 
 ---
 
