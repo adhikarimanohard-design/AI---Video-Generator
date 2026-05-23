@@ -60,7 +60,7 @@ Video Assembly (.mp4)
 
 # 1️⃣ AI Script Generation
 
-Uses free-tier LLMs (Groq / Gemini )
+Uses free-tier LLMs ( Groq )
 
 Generates a structured narration script based on the topic
 
